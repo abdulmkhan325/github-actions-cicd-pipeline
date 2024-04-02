@@ -1,0 +1,22 @@
+name: Hello World
+
+run-name: ${{ github.actor }} is testing out GitHub Actions!
+
+on:
+    push:
+      branches: [ "pipeline" ]
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: hello world
+        run: echo "Hello World! and list files in the repository"  
+
+  goodbye:
+    runs-on: ubuntu-latest
+    steps:
+      - name: goodbye world
+        run: echo "Good Bye World!"  
+           
