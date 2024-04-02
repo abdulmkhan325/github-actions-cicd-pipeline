@@ -1,7 +1,7 @@
 # React App CI/CD Pipeline Using GitHub Actions
 
 ### Skills Used: 
-GitHub Actions, Docker, Kubernetes, Trivy, Promethus, Grafana, Argo CD
+GitHub Actions, Docker, Trivy, CodeQL 
 
 # The pipeline strucutre:
 
