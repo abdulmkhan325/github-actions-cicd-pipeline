@@ -1,0 +1,30 @@
+...
+Pipeline Structure - CI/CD
+------------------
+Ansible
+  - Create Cluster (Bash Script running from an Ansible Playbook)
+  - Delete Cluster (Ansible Playbook)
+
+
+App development + build operator bundle(CI/CD)
+------------------
+React Web App
+  - App can be a simple website 
+  - Containerize - Docker
+  - Image CI/CD using Jenkins locally 
+Test application
+
+Running the application on ROSA cluster
+- Creating Operators - Golang
+
+
+Pipeline Structure - CI/CD
+------------------
+- Tekton-Pipeline
+  - Deployment of the operator
+
+- ansible folder
+  - ansible playbook
+    - call out to different roles
+      - these roles are responsible running your code
+        - If you have scritps then these scripts can go in a folder called scripts. could be your bash script
