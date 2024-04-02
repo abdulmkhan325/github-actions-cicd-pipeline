@@ -6,7 +6,7 @@ on:
       - release  
   push:
     branches:
-      - pipeline  
+      - dev  
 
 jobs:
   start-message:  #Job1
