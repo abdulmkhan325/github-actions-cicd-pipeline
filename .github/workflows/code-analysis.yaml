@@ -2,9 +2,11 @@ name: CodeQL Analysis
 
 on:
   workflow_run:
-    workflows: ["Continuous Integration Workflow"]
+    workflows:
+      - Continuous Integration Workflow
     types:
       - completed
+
 
 jobs:
   build:
