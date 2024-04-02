@@ -7,5 +7,7 @@ GitHub Actions, Docker, Kubernetes, Trivy, Promethus, Grafana, Argo CD
 
 ### React Web App: 
 it is a simple To-do web app.
+
+You can add items into it 
  
 
