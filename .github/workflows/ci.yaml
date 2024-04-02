@@ -7,7 +7,7 @@ on:
       - release  
   push:
     branches:
-      - push 
+      - pipeline  
 
 defaults:
   run:
