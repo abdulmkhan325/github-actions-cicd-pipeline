@@ -4,9 +4,13 @@ on:
   pull_request:
     branches:
       - release  
+    paths: 
+      - 'react-app/**'
   push:
     branches:
       - dev  
+    paths: 
+      - 'react-app/**'
 
 jobs:
   start-message:  #Job1

@@ -6,12 +6,12 @@ on:
     branches:
       - release  
     paths: 
-      - react-app/'**'
+      - 'react-app/**'
   push:
     branches:
       - dev  
     paths: 
-      - react-app/'**'
+      - 'react-app/**'
       
 defaults:
   run:
