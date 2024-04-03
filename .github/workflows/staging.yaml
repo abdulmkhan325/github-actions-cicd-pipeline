@@ -1,0 +1,20 @@
+name: Create Staging Enviroment
+
+on:
+    pull_request:
+      branches:
+        - release   
+
+jobs:
+  create:
+    name: 'Create staging and deploy'
+    defaults:
+      run:
+        shell: bash
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: hello world
+        run: echo "Hello World! and list files in the repository"  
