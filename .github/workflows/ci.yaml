@@ -1,17 +1,12 @@
 name: Continuous Integration Workflow
 
-# This workflow is triggered whenever a new PR is created on the main branch
 on:
   pull_request:
     branches:
-      - release  
-    paths: 
-      - 'react-app/**'
+      - release   
   push:
     branches:
-      - dev  
-    paths: 
-      - 'react-app/**'
+      - dev   
       
 defaults:
   run:
