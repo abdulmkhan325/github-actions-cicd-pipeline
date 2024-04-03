@@ -18,7 +18,7 @@ jobs:
     
     steps:
  
-    # Check that the PR number    
+    # Check the PR number    
     - name: Verify Pull Request Number
       uses: actions/github-script@v5
       id: verify_pr_number
