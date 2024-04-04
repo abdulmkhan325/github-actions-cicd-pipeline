@@ -61,7 +61,7 @@ jobs:
         run: |
           # SSH into the AWS Ubuntu instance
 
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ steps.terraform_output.outputs.* }} << 'EOF'
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ steps.terraform_output.outputs.staging_server_dns }} << 'EOF'
 
           # Clone the GitHub repository
           git clone https://github.com/abdulmkhan325/github-actions-cicd-pipeline.git
