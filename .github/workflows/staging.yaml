@@ -8,6 +8,7 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_INSTANCE_URL: ""
 
 jobs:
   create:
@@ -19,10 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
-      - name: staging-hellow-message
-        run: echo "Hello! Creating staging instance"  
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -54,16 +51,46 @@ jobs:
         working-directory: infra/ 
         run: terraform apply -auto-approve
         
-
-      - name: Verify Deployment
+      - name: Terraform Output
+        id: terraform_output
         run: |
-          # Get the public DNS of the staging server
-          STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns) 
-          echo $STAGING_SERVER_DNS
+          export STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns)
+          echo "STAGING_SERVER_DNS=$STAGING_SERVER_DNS" >> $GITHUB_ENV
+        continue-on-error: true
 
-      # Always run this step, even if previous steps fail    
-      - name: Destroy Staging Environment
-        if: always() 
+      - name: Install Dependencies and Verify Deployment
         run: |
-          # Destroy the staging environment to avoid incurring costs
-          terraform destroy -auto-approve
+          # SSH into the AWS Ubuntu instance
+          ssh -i /.creds/staging_key.ppk ec2-user@${{ steps.terraform_output.outputs.staging_server_dns }} << 'EOF'
+
+          # Clone the GitHub repository
+          git clone https://github.com/abdulmkhan325/github-actions-cicd-pipeline.git
+          cd github-actions-cicd-pipeline/react-app
+      
+          # Install project dependencies
+          npm install
+      
+          # Build the React app
+          npm run build
+      
+          # Start a simple server to serve the built files
+          npm start
+      
+          # Wait for the server to start
+          sleep 5
+      
+          # Verify the application is running
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+          if [ $response -eq 200 ]; then
+            echo "Application is running successfully"
+          else
+            echo "Application is not running, HTTP status code: $response"
+            exit 1
+          fi
+          
+          EOF
+
+      - name: Terraform Destroy
+        id: destroy
+        working-directory: infra/ 
+        run: terraform destroy -auto-approve
