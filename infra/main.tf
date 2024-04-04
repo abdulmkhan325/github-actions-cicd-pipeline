@@ -12,7 +12,7 @@ provider "aws" {
   region = "ap-southeast-2"  
 }
 
-resource "random_pet" "staging_server_id" {
+resource "random_pet" "random_id" {
   length = 3
 }
  
@@ -33,7 +33,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_key_pair" "staging_key" {
-  key_name   = "staging-key"
+  key_name   = "staging-key-${random_pet.random_id.id}"
   public_key = var.staging_public_key
 
   tags = {
@@ -48,7 +48,7 @@ resource "aws_instance" "staging_server" {
   key_name               = aws_key_pair.staging_key.key_name
 
   tags = {
-    "Name" = "staging_server-${random_pet.staging_server_id.id}"
+    "Name" = "staging_server-${random_pet.random_id.id}"
   }
 }
 
