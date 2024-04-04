@@ -5,10 +5,9 @@ on:
       branches:
         - release   
 
-
 jobs:
   create:
-    name: 'Create staging enviroment with terraform'
+    name: 'Create staging and deploy'
     defaults:
       run:
         shell: bash
@@ -17,4 +16,50 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+      - name: staging-hellow-message
+        run: echo "Hello! Creating staging instance"  
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.11
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Terraform Init and Validate
+        id: init
+        working-directory: infra/
+        run: |
+          terraform init
+          terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: infra/
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        id: apply
+        working-directory: infra/ 
+        run: terraform apply -auto-approve
+        
+
+      - name: Verify Deployment
+        run: |
+          # Get the public DNS of the staging server
+          STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns) 
+          echo $STAGING_SERVER_DNS
+
+      # Always run this step, even if previous steps fail    
+      - name: Destroy Staging Environment
+        if: always() 
+        run: |
+          # Destroy the staging environment to avoid incurring costs
+          terraform destroy -auto-approve
