@@ -15,7 +15,7 @@ provider "aws" {
 resource "random_pet" "staging_server_id" {
   length = 3
 }
-
+ 
 data "aws_ami" "ubuntu" {
   most_recent = true
 

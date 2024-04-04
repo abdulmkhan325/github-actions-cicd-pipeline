@@ -1,9 +1,3 @@
-variable "base_ami_id" {
-  description = "base image for ami id"
-  type        = string
-  default     = "ami-0446efa824bdcbb61"
-}
-
 variable "staging_public_key" {
   description = "Staging environment public key value"
   type        = string
