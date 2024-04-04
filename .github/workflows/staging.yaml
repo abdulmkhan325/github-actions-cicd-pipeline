@@ -20,7 +20,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - name: staging-hellow-message
+      - name: staging-hello-message
         run: echo "Hello! Creating staging instance"  
 
       - name: Checkout code
