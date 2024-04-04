@@ -11,7 +11,7 @@ env:
 
 jobs:
   create:
-    name: 'Create staging enviroment using terraform'
+    name: 'Create staging enviroment with terraform'
     defaults:
       run:
         shell: bash
