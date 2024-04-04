@@ -32,13 +32,8 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_key_pair" "staging_key" {
-  key_name   = "staging-key-${random_pet.random_id.id}"
-  public_key = var.staging_public_key
-
-  tags = {
-    "Name" = "staging_public_key"
-  }
+data "aws_key_pair" "staging_key" {
+  key_name = "staging_key"
 }
 
 resource "aws_instance" "staging_server" {
