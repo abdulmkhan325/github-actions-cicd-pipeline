@@ -8,11 +8,8 @@ terraform {
   required_version = ">= 0.15.0"
 }
 
-provider "aws" {
-  profile = "default"  
-  region = "ap-southeast-2"
-  access_key = var.AWS_ACCESS_KEY_ID
-  secret_key = var.AWS_SECRET_ACCESS_KEY
+provider "aws" { 
+  region = "ap-southeast-2"  
 }
 
 variable "staging_public_key" {
