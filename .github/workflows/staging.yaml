@@ -5,9 +5,6 @@ on:
       branches:
         - release   
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   create:
@@ -20,49 +17,4 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      - name: staging-hello-message
-        run: echo "Hello! Creating staging instance"  
 
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.0.11
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-      
-      - name: Terraform Init and Validate
-        id: init
-        working-directory: infra/
-        run: |
-          terraform init
-          terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color
-        working-directory: infra/
-        continue-on-error: true
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        id: apply
-        working-directory: infra/ 
-        run: terraform apply -auto-approve
-        
-
-      - name: Verify Deployment
-        run: | 
-          STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns) 
-          echo $STAGING_SERVER_DNS
-
-      # Always run this step, even if previous steps fail    
-      - name: Destroy Staging Environment
-        if: always() 
-        run: |
-          # Destroy the staging environment to avoid incurring costs
-          terraform destroy -auto-approve
