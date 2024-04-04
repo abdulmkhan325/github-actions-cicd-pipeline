@@ -163,4 +163,6 @@ cython_debug/
 .credentials
 .DS_Store
 .vscode
+.creds
+terraform.tfstate
 node_modules

@@ -1,0 +1,97 @@
+name: Create Staging Enviroment
+
+on:
+    pull_request:
+      branches:
+        - main   
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_INSTANCE_URL: ""
+
+jobs:
+  create:
+    name: 'Create staging and deploy'
+    defaults:
+      run:
+        shell: bash
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.11
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Terraform Init and Validate
+        id: init
+        working-directory: infra/
+        run: |
+          terraform init
+          terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: infra/
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        id: apply
+        working-directory: infra/ 
+        run: terraform apply -auto-approve
+        
+      - name: Terraform Output
+        id: terraform_output
+        working-directory: infra/ 
+        run: terraform output staging_server_dns 
+        continue-on-error: true
+
+      - name: Install Dependencies and Verify Deployment
+        run: |
+          # SSH into the AWS Ubuntu instance
+
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ steps.terraform_output.outputs.staging_server_dns }} << 'EOF'
+
+          # Clone the GitHub repository
+          git clone https://github.com/abdulmkhan325/github-actions-cicd-pipeline.git
+          cd github-actions-cicd-pipeline/react-app
+      
+          # Install project dependencies
+          npm install
+      
+          # Build the React app
+          npm run build
+      
+          # Start a simple server to serve the built files
+          npm start
+      
+          # Wait for the server to start
+          sleep 5
+      
+          # Verify the application is running
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+          if [ $response -eq 200 ]; then
+            echo "Application is running successfully"
+          else
+            echo "Application is not running, HTTP status code: $response"
+            exit 1
+          fi
+          
+          EOF
+
+      - name: Terraform Destroy
+        id: destroy
+        working-directory: infra/ 
+        run: terraform destroy -auto-approve
+        if: always()

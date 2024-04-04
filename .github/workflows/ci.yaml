@@ -1,0 +1,53 @@
+name: Continuous Integration Workflow
+
+on:
+  pull_request:
+    branches:
+      - release   
+  push:
+    branches:
+      - dev   
+      
+defaults:
+  run:
+    shell: bash
+    # Define the working directory for all run steps in the workflow
+    working-directory: ./react-app
+
+jobs:
+
+  # Run unit tests to make sure everything is okay
+  test:
+    name: 'Run unit tests'
+    
+    # Specify the OS we want the workflow to run on
+    runs-on: ubuntu-latest
+    # Define the steps for this job
+    steps:
+    - uses: actions/checkout@v4
+      name: 'Checkout repository'
+
+    - name: 'Install Dependencies'
+      run: npm install
+    
+    - name: 'Run Tests'
+      run: npm run test
+
+  # Run the linter to check for code style issues
+  lint:
+    name: 'Run linter'
+    defaults:
+      run:
+        shell: bash
+        # Define the working directory for all run steps in the workflow
+        working-directory: ./react-app
+    runs-on: ubuntu-latest
+    steps:    
+    - uses: actions/checkout@v4
+      name: 'Checkout repository'
+    
+    - name: 'Install Dependencies'
+      run: npm install
+
+    - name: 'Run Linter'
+      run: npx standard --fix --quiet || true

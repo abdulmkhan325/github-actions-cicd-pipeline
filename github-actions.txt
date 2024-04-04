@@ -1,0 +1,122 @@
+name: Hello World
+
+run-name: ${{ github.actor }} is testing out GitHub Actions!
+
+on:
+    push:
+      branches: [ "pipeline" ]
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: hello world
+        run: echo "Hello World! and list files in the repository"  
+
+  goodbye:
+    runs-on: ubuntu-latest
+    steps:
+      - name: goodbye world
+        run: echo "Good Bye World!"  
+           
+
+
+
+
+
+name: Create Staging Enviroment
+
+on:
+    pull_request:
+      branches:
+        - release   
+
+jobs:
+  create:
+    name: 'Create staging and deploy'
+    defaults:
+      run:
+        shell: bash
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: staging-hellow-message
+        run: echo "Hello! Creating staging instance"  
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.11
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      
+      - name: Terraform Init and Validate
+        id: init
+        working-directory: infra/
+        run: |
+          terraform init
+          terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        working-directory: infra/
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        id: apply
+        working-directory: infra/ 
+        run: terraform apply -auto-approve
+        
+
+      - name: Verify Deployment
+        run: |
+          # Get the public DNS of the staging server
+          STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns) 
+          
+          echo $STAGING_SERVER_DNS
+
+          # Connect to the staging server
+          ssh ec2-user@$STAGING_SERVER_DNS << EOF
+
+            sudo apt-get install -y git
+            sudo apt-get install -y nodejs npm
+ 
+            git clone https://github.com/abdulmkhan325/github-actions-cicd-pipeline.git 
+            cd github-actions-cicd-pipeline/react-app
+       
+            npm install
+            npm start
+       
+            HTTP_RESPONSE=$(curl --write-out "%{http_code}" --silent --output /dev/null http://$STAGING_SERVER_DNS:3000)
+      
+            if [ "$HTTP_RESPONSE" == "200" ]; then
+              echo "Deployment verification successful"
+              exit 0
+            else
+              echo "Deployment verification failed"
+              exit 1
+            fi
+          EOF
+      
+          # Check the exit code of the SSH command
+          if [ $? -ne 0 ]; then
+            echo "Deployment failed"
+            exit 1
+          fi
+
+      # Always run this step, even if previous steps fail    
+      - name: Destroy Staging Environment
+        if: always() 
+        run: |
+          # Destroy the staging environment to avoid incurring costs
+          terraform destroy -auto-approve
