@@ -163,4 +163,5 @@ cython_debug/
 .credentials
 .DS_Store
 .vscode
+.creds
 node_modules

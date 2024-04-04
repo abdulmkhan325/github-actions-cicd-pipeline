@@ -1,0 +1,11 @@
+Set up Terraform Cloud:
+
+Sign in to your Terraform Cloud account or create a new one if you don’t have it already.
+Create a new organization and workspace in Terraform Cloud to manage your infrastructure.
+Obtain the Terraform Cloud API token from the User Settings page. You will need this token to authenticate your GitHub Actions with Terraform Cloud.
+
+Configure GitHub Secrets:
+
+In your GitHub repository, go to Settings > Secrets.
+Create a new secret called TF_API_TOKEN and paste your Terraform Cloud API token as the value. This secret will be used by GitHub Actions to authenticate with Terraform Cloud.
+
