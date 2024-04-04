@@ -55,7 +55,7 @@ jobs:
         id: terraform_output
         working-directory: infra/ 
         #run: terraform output staging_server_dns
-        run: echo "terraform output staging_server_dns" >> $GITHUB_OUTPUT
+        run: echo "terraform output -json staging_server_dns" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Install Dependencies and Verify Deployment
