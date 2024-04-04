@@ -8,15 +8,9 @@ on:
     branches:
       - dev  
 
-jobs:
-  start-message:  #Job1
-    runs-on: ubuntu-latest
+jobs: 
 
-    steps:
-    - name: Start analysis 
-      run: echo "Code analysis will begin!"
-
-  analyze:        #Job2
+  analyze:        #Job1
     name: Analyze code
     runs-on: ubuntu-latest
     permissions:

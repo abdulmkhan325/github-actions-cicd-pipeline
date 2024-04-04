@@ -12,11 +12,6 @@ provider "aws" {
   region = "ap-southeast-2"  
 }
 
-variable "staging_public_key" {
-  description = "Staging environment public key value"
-  type        = string
-}
-
 resource "random_pet" "staging_server_id" {
   length = 3
 }
