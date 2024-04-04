@@ -3,7 +3,7 @@ name: Create Staging Enviroment
 on:
     pull_request:
       branches:
-        - release   
+        - main   
 
 jobs:
   create:
