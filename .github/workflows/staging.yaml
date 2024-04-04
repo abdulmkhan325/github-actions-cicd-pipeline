@@ -53,15 +53,13 @@ jobs:
         
       - name: Terraform Output
         id: terraform_output
-        run: |
-          export STAGING_SERVER_DNS=$(terraform output -raw staging_server_dns)
-          echo "STAGING_SERVER_DNS=$STAGING_SERVER_DNS" >> $GITHUB_ENV
+        run: echo "${{ steps.apply.outputs.staging_server_dns }}"
         continue-on-error: true
 
       - name: Install Dependencies and Verify Deployment
         run: |
           # SSH into the AWS Ubuntu instance
-          ssh -i /.creds/staging_key.ppk ec2-user@${{ steps.terraform_output.outputs.staging_server_dns }} << 'EOF'
+          ssh -i /.creds/staging_key.ppk ec2-user@${{ steps.apply.outputs.staging_server_dns }} << 'EOF'
 
           # Clone the GitHub repository
           git clone https://github.com/abdulmkhan325/github-actions-cicd-pipeline.git
@@ -94,3 +92,4 @@ jobs:
         id: destroy
         working-directory: infra/ 
         run: terraform destroy -auto-approve
+        if: always()
