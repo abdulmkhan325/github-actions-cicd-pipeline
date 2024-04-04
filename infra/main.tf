@@ -40,7 +40,7 @@ resource "aws_instance" "staging_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.micro" 
   vpc_security_group_ids = ["sg-01c54088241abb5c0"]
-  key_name               = aws_key_pair.staging_key.key_name
+  key_name               = data.aws_key_pair.staging_key.key_name
 
   tags = {
     "Name" = "staging_server-${random_pet.random_id.id}"
